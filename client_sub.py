@@ -7,21 +7,9 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 broker_address = ('localhost', 10000)
 port = 10001
-messageA = b'sub:id:%i'%port
-messageB = b'sub:topic:game'
 
 # Variable to control if the port selected is free
 connected = False
-
-try:
-    # Send data
-    print('sending {!r}'.format(messageA))
-    sent = sock.sendto(messageA, broker_address)
-    print('sending {!r}'.format(messageB))
-    sent = sock.sendto(messageB, broker_address)
-finally:
-    print('closing socket')
-    sock.close()
 
 # Bind the socket to the port
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -38,7 +26,22 @@ while not connected:
         if error.args[0] == errno.EADDRINUSE:
             port += 1
 
+messageA = b'sub:id:%i'%port
+messageB = b'sub:topic:game'
 
+try:
+    # Send data
+    print('sending {!r}'.format(messageA))
+    sent = sock.sendto(messageA, broker_address)
+    print('sending {!r}'.format(messageB))
+    sent = sock.sendto(messageB, broker_address)
+finally:
+    print('closing socket')
+    sock.close()
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_address = ('localhost', port)
+sock.bind(server_address)
 while True:
     print('\nwaiting to receive message')
     rlist, _, _ = select.select([sock], [], []) 
